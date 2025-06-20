@@ -96,10 +96,10 @@ const data = [
     answerSR: "Volim da jedem pastu i picu."
   },
   {
-    question: "What do you do in the morning",
-    questionSR: "Šta radiš ujutru?",
-    answer: "I brush my teeth and eat breakfast",
-    answerSR: "Perem zube i doručkujem."
+    question: "Are you free in the morning",
+    questionSR: "Da li si slobodan ujutru?",
+    answer: "Yes I am free in the morning",
+    answerSR: "Da, slobodan sam ujutru."
   },
   {
     question: "Where did you go on vacation",
@@ -121,6 +121,9 @@ const data = [
   }
 ];
 
+let totalCorrect = 0;
+let totalIncorrect = 0;
+
 function shuffle(array) {
   return array.sort(() => Math.random() - 0.5);
 }
@@ -134,38 +137,53 @@ function renderPage(startIndex, endIndex, containerId) {
     block.className = "question-block";
 
     const questionEl = document.createElement("h3");
-    questionEl.textContent = `${item.questionSR}`;
+    questionEl.textContent = item.questionSR;
     block.appendChild(questionEl);
-
-    block.appendChild(renderSection(item.question, `pitanje-${index}`));
+    block.appendChild(renderSection(item.question));
 
     const answerLabel = document.createElement("div");
     answerLabel.className = "section-label";
     answerLabel.textContent = item.answerSR;
     block.appendChild(answerLabel);
+    block.appendChild(renderSection(item.answer));
 
-    block.appendChild(renderSection(item.answer, `odgovor-${index}`));
     container.appendChild(block);
   });
 }
 
-function renderSection(text, idPrefix) {
+function renderSection(correctText) {
   const section = document.createElement("div");
-  const shuffled = shuffle(text.split(" "));
   const wordsDiv = document.createElement("div");
-  wordsDiv.className = "words";
   const answerDiv = document.createElement("div");
+  wordsDiv.className = "words";
   answerDiv.className = "answer";
+
+  const shuffled = shuffle(correctText.split(" "));
 
   shuffled.forEach(word => {
     const span = document.createElement("span");
     span.className = "word";
     span.textContent = word;
+
     span.addEventListener("click", () => {
-      if (answerDiv.locked) return;
-      answerDiv.textContent += word + " ";
+      if (answerDiv.locked || span.disabled) return;
+
+      const answerWord = document.createElement("span");
+      answerWord.className = "word";
+      answerWord.textContent = word;
+
+      answerWord.addEventListener("click", () => {
+        answerWord.remove();
+        span.style.visibility = "visible";
+        span.disabled = false;
+      });
+
       span.style.visibility = "hidden";
+      span.disabled = true;
+      wordsDiv.appendChild(span);
+      answerDiv.appendChild(answerWord);
     });
+
     wordsDiv.appendChild(span);
   });
 
@@ -173,15 +191,22 @@ function renderSection(text, idPrefix) {
   checkBtn.textContent = "Proveri";
   checkBtn.addEventListener("click", () => {
     if (answerDiv.locked) return;
-    const original = text;
-    const userAnswer = answerDiv.textContent.trim();
-    if (userAnswer === original) {
+
+    const userAnswer = Array.from(answerDiv.querySelectorAll(".word"))
+      .map(w => w.textContent)
+      .join(" ")
+      .trim();
+
+    if (userAnswer === correctText) {
       answerDiv.classList.add("correct");
-      answerDiv.textContent += " ✅ Tačno!";
+      answerDiv.innerHTML += " ✅ Tačno!";
+      totalCorrect++;
     } else {
       answerDiv.classList.add("incorrect");
-      answerDiv.textContent = `❌ Netačno! Ispravno: ${original}`;
+      answerDiv.innerHTML = `❌ Netačno! Ispravno: ${correctText}`;
+      totalIncorrect++;
     }
+
     answerDiv.locked = true;
   });
 
@@ -196,6 +221,7 @@ document.getElementById("page1-btn").addEventListener("click", () => {
   document.getElementById("quiz-page-2").classList.add("hidden");
   document.getElementById("page1-btn").classList.add("active");
   document.getElementById("page2-btn").classList.remove("active");
+  window.scrollTo({ top: 0, behavior: "smooth" });
 });
 
 document.getElementById("page2-btn").addEventListener("click", () => {
@@ -203,6 +229,18 @@ document.getElementById("page2-btn").addEventListener("click", () => {
   document.getElementById("quiz-page-2").classList.remove("hidden");
   document.getElementById("page2-btn").classList.add("active");
   document.getElementById("page1-btn").classList.remove("active");
+  window.scrollTo({ top: 0, behavior: "smooth" });
+});
+
+document.getElementById("finish-btn")?.addEventListener("click", () => {
+  const total = totalCorrect + totalIncorrect;
+  const percentage = total === 0 ? 0 : Math.round((totalCorrect / total) * 100);
+  const percentClass = percentage >= 75 ? "c-green" : percentage >= 50 ? "c-yellow" : "c-red";
+
+  document.getElementById("result").innerHTML =
+    `Rezultat: <span class="c-green">${totalCorrect} tačnih</span>, ` +
+    `<span class="c-red">${totalIncorrect} netačnih</span> – ` +
+    `<span class="${percentClass}">${percentage}% uspešnosti</span>.`;
 });
 
 renderPage(0, 10, "quiz-page-1");

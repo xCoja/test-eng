@@ -1,124 +1,89 @@
-body {
-  font-family: 'Segoe UI', sans-serif;
-  background: #1e1e1e;
-  margin: 0;
-  padding: 20px;
-  color: #f0f0f0;
-   font-family: "Poppins", sans-serif;
-  font-weight: 400;
-  font-style: normal;
+/* Osnovni izgled stranice */
+body{
+  font-family:"Poppins",sans-serif;
+  background:#1e1e1e;
+  margin:0;
+  padding:20px;
+  color:#f0f0f0;
 }
 
-.container {
-  max-width: 850px;
-  margin: auto;
-  background: #ffffff;
-  padding: 30px;
-  border-radius: 10px;
-  box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
-  color: #111;
+/* Bela kartica u centru */
+.container{
+  max-width:850px;
+  margin:auto;
+  background:#fff;
+  padding:30px;
+  border-radius:10px;
+  box-shadow:0 0 15px rgba(0,0,0,.25);
+  color:#111;
 }
 
-h1 {
-  text-align: center;
-  margin-bottom: 10px;
-  color: #222;
+h1{margin:0 0 10px;text-align:center;color:#222}
+.instructions{text-align:center;margin:0 0 25px;color:#444;font-size:16px}
+
+/* Pitanja / Odgovori */
+.quiz-page{margin-bottom:40px}
+.question-block{margin-bottom:40px;border-bottom:1px solid #ddd;padding-bottom:25px}
+.question-block h3{margin:0 0 10px;font-size:18px;color:#222}
+.section-label{font-weight:600;margin-top:15px}
+
+/* Reči u gornjoj traci */
+.words{
+  display:flex;flex-wrap:wrap;gap:8px;margin:10px 0;
+}
+.word{
+  padding:6px 10px;
+  border:1px solid #999;
+  border-radius:5px;
+  background:#e0e0e0;
+  cursor:pointer;
+  user-select:none;
+  transition:.2s;
+}
+.word:hover{background:#cfcfcf}
+
+/* Ista .word kada je u answer-divu (nema pozadine) */
+.answer .word{
+  background:none;
+  border:none;
+  color:#1976d2;
+  font-weight:600;
 }
 
-.instructions {
-  text-align: center;
-  margin-top: 0;
-  margin-bottom: 30px;
-  color: #444;
-  font-size: 16px;
+/* Answer kutija + status boje */
+.answer{
+  font-weight:600;
+  min-height:30px;
+  margin-bottom:10px;
+  padding:8px;
+  border-radius:5px;
 }
+.correct{background:#d4edda;color:#155724}
+.incorrect{background:#f8d7da;color:#721c24}
 
-.quiz-page {
-  margin-bottom: 40px;
+/* Dugmad */
+button{
+  padding:8px 14px;
+  background:#1976d2;
+  color:#fff;
+  border:none;
+  border-radius:5px;
+  cursor:pointer;
+  margin-top:10px;
 }
+button:hover{background:#125a9c}
 
-.question-block {
-  margin-bottom: 40px;
-  border-bottom: 1px solid #ddd;
-  padding-bottom: 25px;
-}
+.pagination{text-align:center;margin-top:20px}
+.pagination button{width:40px;margin:5px;border-radius:50%}
+button.active{background:#125a9c}
 
-h3 {
-  margin: 0 0 10px;
-  font-size: 18px;
-  color: #222;
-}
+.finish{text-align:center;margin-top:30px}
+.result{margin-top:20px;font-size:18px;color:#222}
 
-.section-label {
-  font-weight: bold;
-  margin-top: 15px;
-}
+.hidden{display:none}
 
-.words {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-  margin: 10px 0;
-}
 
-.word {
-  background: #e0e0e0;
-  padding: 8px 12px;
-  border-radius: 6px;
-  cursor: pointer;
-  user-select: none;
-}
-
-.word:hover {
-  background: #cfcfcf;
-}
-
-.answer {
-  font-weight: bold;
-  min-height: 30px;
-  margin-bottom: 10px;
-  padding: 8px;
-  border-radius: 5px;
-}
-
-.correct {
-  background-color: #d4edda;
-  color: #155724;
-}
-
-.incorrect {
-  background-color: #f8d7da;
-  color: #721c24;
-}
-
-button {
-  padding: 8px 14px;
-  background-color: #1976d2;
-  color: white;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-  margin-top: 10px;
-}
-
-button:hover {
-  background-color: #125a9c;
-}
-
-.pagination {
-  text-align: center;
-}
-
-.pagination button {
-  width: 40px;
-  margin: 5px;
-  border-radius: 50%;
-}
-
-.hidden {
-  display: none;
-}
-
-button.active {
-  background-color: #125a9c;
-}
+/* ---- boje za rezultate ---- */
+.c-green {color:#28a745;font-weight:600;}
+.c-yellow{color:#ffc107;font-weight:600;}
+.c-red   {color:#dc3545;font-weight:600;}
