@@ -171,6 +171,7 @@ function renderSection(correctText) {
       const answerWord = document.createElement("span");
       answerWord.className = "word";
       answerWord.textContent = word;
+      answerWord.style.background = "none";
 
       answerWord.addEventListener("click", () => {
         answerWord.remove();
@@ -180,7 +181,6 @@ function renderSection(correctText) {
 
       span.style.visibility = "hidden";
       span.disabled = true;
-      wordsDiv.appendChild(span);
       answerDiv.appendChild(answerWord);
     });
 
@@ -203,7 +203,9 @@ function renderSection(correctText) {
       totalCorrect++;
     } else {
       answerDiv.classList.add("incorrect");
-      answerDiv.innerHTML = `❌ Netačno! Ispravno: ${correctText}`;
+      const userDisplay = `<span style="color:#888;font-style:italic;">Tvoj odgovor:</span> ${userAnswer}<br>`;
+      const correctDisplay = `<strong>Ispravno:</strong> ${correctText}`;
+      answerDiv.innerHTML = `❌ Netačno!<br>${userDisplay}${correctDisplay}`;
       totalIncorrect++;
     }
 
@@ -234,13 +236,15 @@ document.getElementById("page2-btn").addEventListener("click", () => {
 
 document.getElementById("finish-btn")?.addEventListener("click", () => {
   const total = totalCorrect + totalIncorrect;
-  const percentage = total === 0 ? 0 : Math.round((totalCorrect / total) * 100);
-  const percentClass = percentage >= 75 ? "c-green" : percentage >= 50 ? "c-yellow" : "c-red";
+  const percent = total ? Math.round((totalCorrect / total) * 100) : 0;
+  let percentClass = "c-red";
+  if (percent >= 75) percentClass = "c-green";
+  else if (percent >= 50) percentClass = "c-yellow";
 
   document.getElementById("result").innerHTML =
-    `Rezultat: <span class="c-green">${totalCorrect} tačnih</span>, ` +
+    `<span class="c-green">${totalCorrect} tačnih</span>, ` +
     `<span class="c-red">${totalIncorrect} netačnih</span> – ` +
-    `<span class="${percentClass}">${percentage}% uspešnosti</span>.`;
+    `<span class="${percentClass}">${percent}% uspešnosti</span>`;
 });
 
 renderPage(0, 10, "quiz-page-1");
