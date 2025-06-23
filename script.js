@@ -1,3 +1,9 @@
+// Log visit when someone opens the site
+fetch("https://eng-back-cq47.onrender.com/api/visit", {
+  method: "POST"
+}).catch(err => console.error("Visit log failed:", err));
+
+
 const data = [
   {
     question: "What do you do for a living",
