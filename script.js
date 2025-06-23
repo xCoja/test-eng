@@ -123,6 +123,7 @@ const data = [
 
 let totalCorrect = 0;
 let totalIncorrect = 0;
+const testStart = Date.now();
 
 function shuffle(array) {
   return array.sort(() => Math.random() - 0.5);
@@ -132,7 +133,7 @@ function renderPage(startIndex, endIndex, containerId) {
   const container = document.getElementById(containerId);
   container.innerHTML = "";
 
-  data.slice(startIndex, endIndex).forEach((item, index) => {
+  data.slice(startIndex, endIndex).forEach((item) => {
     const block = document.createElement("div");
     block.className = "question-block";
 
@@ -160,14 +161,13 @@ function renderSection(correctText) {
 
   const shuffled = shuffle(correctText.split(" "));
 
-  shuffled.forEach(word => {
+  shuffled.forEach((word) => {
     const span = document.createElement("span");
     span.className = "word";
     span.textContent = word;
 
     span.addEventListener("click", () => {
       if (answerDiv.locked || span.disabled) return;
-
       const answerWord = document.createElement("span");
       answerWord.className = "word";
       answerWord.textContent = word;
@@ -193,7 +193,7 @@ function renderSection(correctText) {
     if (answerDiv.locked) return;
 
     const userAnswer = Array.from(answerDiv.querySelectorAll(".word"))
-      .map(w => w.textContent)
+      .map((w) => w.textContent)
       .join(" ")
       .trim();
 
@@ -207,6 +207,8 @@ function renderSection(correctText) {
       const correctDisplay = `<strong>Ispravno:</strong> ${correctText}`;
       answerDiv.innerHTML = `❌ Netačno!<br>${userDisplay}${correctDisplay}`;
       totalIncorrect++;
+      if (!window.missed) window.missed = [];
+      window.missed.push(correctText);
     }
 
     answerDiv.locked = true;
@@ -237,14 +239,30 @@ document.getElementById("page2-btn").addEventListener("click", () => {
 document.getElementById("finish-btn")?.addEventListener("click", () => {
   const total = totalCorrect + totalIncorrect;
   const percent = total ? Math.round((totalCorrect / total) * 100) : 0;
-  let percentClass = "c-red";
-  if (percent >= 75) percentClass = "c-green";
-  else if (percent >= 50) percentClass = "c-yellow";
+  let pcClass = percent >= 75 ? "c-green" : percent >= 50 ? "c-yellow" : "c-red";
 
   document.getElementById("result").innerHTML =
     `<span class="c-green">${totalCorrect} tačnih</span>, ` +
     `<span class="c-red">${totalIncorrect} netačnih</span> – ` +
-    `<span class="${percentClass}">${percent}% uspešnosti</span>`;
+    `<span class="${pcClass}">${percent}% uspešnosti</span>`;
+
+  const payload = {
+    timestamp: Date.now(),
+    elapsed: Math.round((Date.now() - testStart) / 1000),
+    score: percent,
+    correct: totalCorrect,
+    incorrect: totalIncorrect,
+    missed: window.missed || []
+  };
+
+  fetch("http://localhost:8080/api/results", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(payload)
+  })
+  .then(res => res.json())
+  .then(data => console.log("✅ Rezultat sačuvan:", data))
+  .catch(err => console.error("❌ Greška pri slanju rezultata:", err));
 });
 
 renderPage(0, 10, "quiz-page-1");
