@@ -121,6 +121,8 @@ const data = [
   }
 ];
 
+
+
 let totalCorrect = 0;
 let totalIncorrect = 0;
 const testStart = Date.now();
@@ -255,14 +257,12 @@ document.getElementById("finish-btn")?.addEventListener("click", () => {
     missed: window.missed || []
   };
 
-  fetch("http://localhost:8080/api/results", {
+  // ✅ UPDATED BACKEND LINK HERE:
+  fetch("https://eng-back-oq47.onrender.com/api/results", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(payload)
-  })
-  .then(res => res.json())
-  .then(data => console.log("✅ Rezultat sačuvan:", data))
-  .catch(err => console.error("❌ Greška pri slanju rezultata:", err));
+  }).catch(err => console.error("Failed to save result:", err));
 });
 
 renderPage(0, 10, "quiz-page-1");
