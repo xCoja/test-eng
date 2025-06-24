@@ -129,6 +129,10 @@ const data = [
 
 
 
+
+
+
+
 let totalCorrect = 0;
 let totalIncorrect = 0;
 const testStart = Date.now();
@@ -148,19 +152,20 @@ function renderPage(startIndex, endIndex, containerId) {
     const questionEl = document.createElement("h3");
     questionEl.textContent = item.questionSR;
     block.appendChild(questionEl);
-    block.appendChild(renderSection(item.question));
+    block.appendChild(renderSection(item));
 
     const answerLabel = document.createElement("div");
     answerLabel.className = "section-label";
     answerLabel.textContent = item.answerSR;
     block.appendChild(answerLabel);
-    block.appendChild(renderSection(item.answer));
+    block.appendChild(renderSection(item, true));
 
     container.appendChild(block);
   });
 }
 
-function renderSection(correctText) {
+function renderSection(item, isAnswer = false) {
+  const correctText = isAnswer ? item.answer : item.question;
   const section = document.createElement("div");
   const wordsDiv = document.createElement("div");
   const answerDiv = document.createElement("div");
@@ -205,7 +210,21 @@ function renderSection(correctText) {
       .join(" ")
       .trim();
 
-    if (userAnswer === correctText) {
+    const isCorrect = userAnswer === correctText;
+
+    // ✅ Loguj pojedinačan odgovor
+    fetch("https://eng-back-cq47.onrender.com/api/answer", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        question: isAnswer ? item.answerSR : item.questionSR,
+        correctAnswer: correctText,
+        userAnswer,
+        isCorrect
+      })
+    }).catch(err => console.error("Answer log failed:", err));
+
+    if (isCorrect) {
       answerDiv.classList.add("correct");
       answerDiv.innerHTML += " ✅ Tačno!";
       totalCorrect++;
@@ -263,7 +282,6 @@ document.getElementById("finish-btn")?.addEventListener("click", () => {
     missed: window.missed || []
   };
 
-  // ✅ UPDATED BACKEND LINK HERE:
   fetch("https://eng-back-cq47.onrender.com/api/results", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
