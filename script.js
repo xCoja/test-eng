@@ -133,6 +133,7 @@ const data = [
 
 
 
+
 let totalCorrect = 0;
 let totalIncorrect = 0;
 const testStart = Date.now();
@@ -152,20 +153,23 @@ function renderPage(startIndex, endIndex, containerId) {
     const questionEl = document.createElement("h3");
     questionEl.textContent = item.questionSR;
     block.appendChild(questionEl);
-    block.appendChild(renderSection(item));
 
+    const questionSection = renderSection(item.question, item.questionSR, false);
     const answerLabel = document.createElement("div");
     answerLabel.className = "section-label";
     answerLabel.textContent = item.answerSR;
+
+    const answerSection = renderSection(item.answer, item.answerSR, true);
+
+    block.appendChild(questionSection);
     block.appendChild(answerLabel);
-    block.appendChild(renderSection(item, true));
+    block.appendChild(answerSection);
 
     container.appendChild(block);
   });
 }
 
-function renderSection(item, isAnswer = false) {
-  const correctText = isAnswer ? item.answer : item.question;
+function renderSection(correctText, displayText, isAnswer) {
   const section = document.createElement("div");
   const wordsDiv = document.createElement("div");
   const answerDiv = document.createElement("div");
@@ -212,12 +216,11 @@ function renderSection(item, isAnswer = false) {
 
     const isCorrect = userAnswer === correctText;
 
-    // ✅ Loguj pojedinačan odgovor
     fetch("https://eng-back-cq47.onrender.com/api/answer", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        question: isAnswer ? item.answerSR : item.questionSR,
+        question: displayText,
         correctAnswer: correctText,
         userAnswer,
         isCorrect
@@ -274,7 +277,7 @@ document.getElementById("finish-btn")?.addEventListener("click", () => {
     `<span class="${pcClass}">${percent}% uspešnosti</span>`;
 
   const payload = {
-    timestamp: Date.now(),
+    timestamp: new Date().toISOString(),
     elapsed: Math.round((Date.now() - testStart) / 1000),
     score: percent,
     correct: totalCorrect,
